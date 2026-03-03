@@ -7,6 +7,7 @@ import json
 import os
 import sys
 import argparse
+import uuid
 from datetime import datetime
 from pathlib import Path
 from xml.etree.ElementTree import Element, SubElement, tostring
@@ -42,6 +43,7 @@ def load_existing_feeds(feed_path):
                 'link': item.findtext('link', ''),
                 'description': item.findtext('description', ''),
                 'pubDate': item.findtext('pubDate', ''),
+                'guid': item.findtext('guid', ''),
             }
             # 尝试获取 content:encoded
             content = item.find('{http://purl.org/rss/1.0/modules/content/}encoded')
@@ -85,7 +87,16 @@ def generate_rss(config, items):
         SubElement(entry, 'link').text = item['link']
         SubElement(entry, 'description').text = item['description']
         SubElement(entry, 'pubDate').text = item['pubDate']
-        SubElement(entry, 'guid').text = item['link']
+        guid_elem = SubElement(entry, 'guid')
+        # 使用已有 guid，或 link（非 # 时），否则生成唯一 ID
+        if item.get('guid') and item['guid'] != '#':
+            guid_elem.text = item['guid']
+            guid_elem.set('isPermaLink', 'false')
+        elif item['link'] and item['link'] != '#':
+            guid_elem.text = item['link']
+        else:
+            guid_elem.text = f"maxrss-{uuid.uuid4().hex[:12]}"
+            guid_elem.set('isPermaLink', 'false')
         
         # 如果有完整内容，添加到 content:encoded
         if 'content' in item and item['content']:
@@ -107,12 +118,14 @@ def publish_item(config, title, url, desc, content=None):
     # 加载已有条目
     items = load_existing_feeds(feed_path)
     
-    # 创建新条目
+    # 创建新条目（如果没有有效 URL，自动生成唯一 guid）
+    item_guid = url if url and url != '#' else f"maxrss-{uuid.uuid4().hex[:12]}"
     new_item = {
         'title': title,
         'link': url,
         'description': desc,
         'pubDate': datetime.now().strftime('%a, %d %b %Y %H:%M:%S +0800'),
+        'guid': item_guid,
     }
     if content:
         new_item['content'] = content
