@@ -1,0 +1,8 @@
+{
+  "title": "My Private RSS",
+  "description": "我的私人 RSS 订阅",
+  "link": "https://yourusername.github.io/maxRSS",
+  "author": "Your Name",
+  "language": "zh-CN",
+  "max_items": 50
+}
