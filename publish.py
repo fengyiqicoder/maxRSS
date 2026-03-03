@@ -5,13 +5,13 @@ maxRSS - 极简个人 RSS 发布工具
 
 import json
 import os
+import re
 import sys
 import argparse
 import uuid
 from datetime import datetime
 from pathlib import Path
-from xml.etree.ElementTree import Element, SubElement, tostring
-from xml.dom.minidom import parseString
+from xml.sax.saxutils import escape as xml_escape
 
 
 def load_config():
@@ -56,60 +56,132 @@ def load_existing_feeds(feed_path):
         return []
 
 
+def markdown_to_html(text):
+    """将 Markdown 转换为 HTML"""
+    if not text:
+        return ''
+    # 如果已经是 HTML（包含 HTML 标签），直接返回
+    if re.search(r'<(p|div|h[1-6]|ol|ul|li|br|hr|a|img|table)\b', text):
+        return text
+
+    try:
+        import markdown
+        return markdown.markdown(text, extensions=['tables', 'fenced_code'])
+    except ImportError:
+        pass
+
+    lines = text.split('\n')
+    html_parts = []
+    in_list = False
+    paragraph = []
+
+    def flush_paragraph():
+        if paragraph:
+            html_parts.append('<p>' + '<br/>'.join(paragraph) + '</p>')
+            paragraph.clear()
+
+    for line in lines:
+        stripped = line.strip()
+
+        # 空行：结束当前段落
+        if not stripped:
+            flush_paragraph()
+            if in_list:
+                html_parts.append('</ol>')
+                in_list = False
+            continue
+
+        # 标题
+        m = re.match(r'^(#{1,6})\s+(.+?)(?:\s*#*\s*)?$', stripped)
+        if m:
+            flush_paragraph()
+            if in_list:
+                html_parts.append('</ol>')
+                in_list = False
+            level = len(m.group(1))
+            content = m.group(2)
+            html_parts.append(f'<h{level}>{content}</h{level}>')
+            continue
+
+        # 分隔线
+        if re.match(r'^[-*_]{3,}\s*$', stripped):
+            flush_paragraph()
+            html_parts.append('<hr/>')
+            continue
+
+        # 有序列表
+        m = re.match(r'^\d+[.、]\s+(.+)$', stripped)
+        if m:
+            flush_paragraph()
+            if not in_list:
+                html_parts.append('<ol>')
+                in_list = True
+            html_parts.append(f'<li>{m.group(1)}</li>')
+            continue
+
+        # 普通段落行
+        if in_list:
+            html_parts.append('</ol>')
+            in_list = False
+        paragraph.append(stripped)
+
+    flush_paragraph()
+    if in_list:
+        html_parts.append('</ol>')
+
+    html = '\n'.join(html_parts)
+    # 行内格式：粗体、链接、图片
+    html = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', html)
+    html = re.sub(r'!\[([^\]]*)\]\(([^)]+)\)', r'<img src="\2" alt="\1"/>', html)
+    html = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', html)
+    return html
+
+
 def generate_rss(config, items):
     """生成 RSS XML"""
-    # 注册命名空间前缀，避免 ElementTree 自动生成 ns0/ns1
-    import xml.etree.ElementTree as ET
-    ET.register_namespace('atom', 'http://www.w3.org/2005/Atom')
-    ET.register_namespace('content', 'http://purl.org/rss/1.0/modules/content/')
-
-    rss = Element('rss')
-    rss.set('version', '2.0')
-    
-    channel = SubElement(rss, 'channel')
-    
-    # 频道信息
-    SubElement(channel, 'title').text = config['title']
-    SubElement(channel, 'description').text = config['description']
-    SubElement(channel, 'link').text = config['link']
-    SubElement(channel, 'language').text = config.get('language', 'zh-CN')
-    SubElement(channel, 'lastBuildDate').text = datetime.now().strftime('%a, %d %b %Y %H:%M:%S +0800')
-    SubElement(channel, 'generator').text = 'maxRSS'
-    
-    # Atom 自链接
-    atom_link = SubElement(channel, '{http://www.w3.org/2005/Atom}link')
-    atom_link.set('href', f"{config['link']}/feed.xml")
-    atom_link.set('rel', 'self')
-    atom_link.set('type', 'application/rss+xml')
-    
-    # 条目
     max_items = config.get('max_items', 50)
+    now = datetime.now().strftime('%a, %d %b %Y %H:%M:%S +0800')
+    feed_url = f"{config['link']}/feed.xml"
+
+    lines = [
+        '<?xml version="1.0" encoding="utf-8"?>',
+        '<rss xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0">',
+        '<channel>',
+        f'<title>{xml_escape(config["title"])}</title>',
+        f'<link>{xml_escape(config["link"])}</link>',
+        f'<description>{xml_escape(config["description"])}</description>',
+        f'<language>{xml_escape(config.get("language", "zh-CN"))}</language>',
+        f'<lastBuildDate>{now}</lastBuildDate>',
+        f'<atom:link href="{xml_escape(feed_url)}" rel="self" type="application/rss+xml"/>',
+    ]
+
     for item in items[:max_items]:
-        entry = SubElement(channel, 'item')
-        SubElement(entry, 'title').text = item['title']
-        SubElement(entry, 'link').text = item['link']
-        SubElement(entry, 'description').text = item['description']
-        SubElement(entry, 'pubDate').text = item['pubDate']
-        guid_elem = SubElement(entry, 'guid')
-        # 使用已有 guid，或 link（非 # 时），否则生成唯一 ID
-        if item.get('guid') and item['guid'] != '#':
-            guid_elem.text = item['guid']
-            guid_elem.set('isPermaLink', 'false')
-        elif item['link'] and item['link'] != '#':
-            guid_elem.text = item['link']
+        # guid
+        guid = item.get('guid', '')
+        if guid and guid != '#':
+            guid_text = guid
+        elif item.get('link') and item['link'] != '#':
+            guid_text = item['link']
         else:
-            guid_elem.text = f"maxrss-{uuid.uuid4().hex[:12]}"
-            guid_elem.set('isPermaLink', 'false')
-        
-        # 如果有完整内容，添加到 content:encoded
-        if 'content' in item and item['content']:
-            content_encoded = SubElement(entry, '{http://purl.org/rss/1.0/modules/content/}encoded')
-            content_encoded.text = item['content']
-    
-    # 格式化 XML
-    rough_string = tostring(rss, encoding='unicode')
-    reparsed = parseString(rough_string)
-    return reparsed.toprettyxml(indent="  ", encoding='utf-8')
+            guid_text = f"maxrss-{uuid.uuid4().hex[:12]}"
+
+        lines.append('<item>')
+        lines.append(f'<title><![CDATA[ {item["title"]} ]]></title>')
+        lines.append(f'<link>{xml_escape(item.get("link", ""))}</link>')
+        lines.append(f'<guid>{xml_escape(guid_text)}</guid>')
+        lines.append(f'<pubDate>{item["pubDate"]}</pubDate>')
+
+        if item.get('content'):
+            html_content = markdown_to_html(item['content'])
+            lines.append(f'<content:encoded><![CDATA[ {html_content} ]]></content:encoded>')
+
+        lines.append(f'<description><![CDATA[ {item.get("description", "")} ]]></description>')
+        lines.append('</item>')
+
+    lines.append('</channel>')
+    lines.append('</rss>')
+
+    return '\n'.join(lines).encode('utf-8')
 
 
 def publish_item(config, title, url, desc, content=None):
