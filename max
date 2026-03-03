@@ -1,0 +1,39 @@
+#!/bin/bash
+# max - 极简 RSS 推送工具
+# 用法: ./max "标题" [链接] [描述]
+
+set -e
+
+cd "$(dirname "$0")"
+
+# 检查参数
+if [ $# -eq 0 ]; then
+    echo "📝 max - 一键推送 RSS"
+    echo ""
+    echo "用法:"
+    echo "  ./max \"文章标题\" [链接] [描述]"
+    echo ""
+    echo "示例:"
+    echo "  ./max \"好文章\" \"https://example.com\" \"这是一篇好文章\""
+    echo "  ./max \"只是记录\"  \"今天天气不错\""
+    echo ""
+    echo "交互模式: python publish.py -i"
+    exit 1
+fi
+
+TITLE="$1"
+URL="${2:-#}"
+DESC="${3:-}"
+
+echo "📡 发布到 maxRSS..."
+python3 publish.py -t "$TITLE" -u "$URL" -d "$DESC"
+
+echo ""
+echo "⬆️  推送到 GitHub..."
+git add .
+git commit -m "📰 $TITLE" || echo "没有变更需要提交"
+git push origin main
+
+echo ""
+echo "✅ 完成！"
+echo "🌐 https://rss.000ooo.ooo/feed.xml"
