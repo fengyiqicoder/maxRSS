@@ -5,14 +5,15 @@
 <link>https://rss.000ooo.ooo</link>
 <description>我的私人 RSS 订阅</description>
 <language>zh-CN</language>
-<lastBuildDate>Tue, 03 Mar 2026 23:58:37 +0800</lastBuildDate>
+<lastBuildDate>Wed, 04 Mar 2026 00:19:16 +0800</lastBuildDate>
 <atom:link href="https://rss.000ooo.ooo/feed.xml" rel="self" type="application/rss+xml"/>
 <item>
-<title><![CDATA[ Rezi.ai 深度增长策略研究报告：从个体痛点到四百万用户的 B2B2C SaaS 破局架构 ]]></title>
+<title><![CDATA[  Rezi.ai 深度增长策略研究报告：从个体痛点到四百万用户的 B2B2C SaaS 破局架构  ]]></title>
 <link>https://rss.000ooo.ooo/feed.xml#rezi-ai-growth-strategy-2026</link>
-<guid>rezi-ai-growth-strategy-20260303</guid>
+<guid isPermaLink="false">rezi-ai-growth-strategy-20260303</guid>
 <pubDate>Tue, 03 Mar 2026 14:40:42 +0800</pubDate>
-<content:encoded><![CDATA[ <h1><strong>Rezi.ai 深度增长策略研究报告：从个体痛点到四百万用户的 B2B2C SaaS 破局架构</strong></h1>
+<description><![CDATA[  深度分析 Rezi.ai 如何从一份 Word 模板成长为拥有 400 万用户、250 万美元 ARR 的 AI 简历 SaaS 平台。涵盖产品主导型增长（PLG）、SEO 矩阵、Reddit 社区营销、终身授权策略、B2B 白标分发网络及开源技术标准等全景增长策略。  ]]></description>
+<content:encoded><![CDATA[  <h1><strong>Rezi.ai 深度增长策略研究报告：从个体痛点到四百万用户的 B2B2C SaaS 破局架构</strong></h1>
 <h2><strong>行业背景与产品基因的萌芽</strong></h2>
 <p>在全球数字化招聘体系中，申请人跟踪系统（Applicant Tracking Systems, 简称 ATS）已经成为企业筛选候选人的首道技术门槛。据市场分析表明，高达 75% 的企业简历在到达人类招聘官手中之前，就已经被自动化系统过滤或拒绝 1。这一现象导致了一个巨大的信息与技术不对称：具备核心竞争力的候选人往往因为简历格式不兼容、排版过于复杂或关键词缺失而痛失面试机会。在这一宏观行业痛点下，Rezi.ai 作为一款主打 ATS 优化的 AI 简历生成 SaaS 平台应运而生。</p>
 <p>Rezi 的创立逻辑深深根植于其创始人 Jacob Jacquet 的极端个人经历。2015 年，从威斯康星大学麦迪逊分校（University of Wisconsin-Madison）毕业的 Jacob 仅拥有 2.2 的平均绩点（GPA）3。在传统的学术导向型筛选机制中，这一成绩几乎是对顶级企业职位的直接否定。然而，凭借对 ATS 简历解析逻辑的深刻理解与针对性优化，他成功获得了包括 Google 和 Goldman Sachs 在内的多家顶级企业的面试邀请 3。这一反直觉的成功案例促使他意识到，获取面试资格的核心变量并非完美的学术背景，而是能否成功“破解”并迎合机器筛选算法的标准 4。</p>
@@ -121,15 +122,14 @@
 <li>Rezi \- $270063 last 30 days \- TrustMRR, 访问时间为 三月 3, 2026， <a href="https://trustmrr.com/startup/rezi">https://trustmrr.com/startup/rezi</a></li>
 <li>Rezi: Year in Review 2023, 访问时间为 三月 3, 2026， <a href="https://www.rezi.ai/posts/year-in-review-2023">https://www.rezi.ai/posts/year-in-review-2023</a></li>
 <li>Bootstrap vs Funding: Complete Comparison \- Allied Venture Partners, 访问时间为 三月 3, 2026， <a href="https://www.allied.vc/guides/bootstrapping-vs-funding-complete-comparison">https://www.allied.vc/guides/bootstrapping-vs-funding-complete-comparison</a></li>
-</ol> ]]></content:encoded>
-<description><![CDATA[ 深度分析 Rezi.ai 如何从一份 Word 模板成长为拥有 400 万用户、250 万美元 ARR 的 AI 简历 SaaS 平台。涵盖产品主导型增长（PLG）、SEO 矩阵、Reddit 社区营销、终身授权策略、B2B 白标分发网络及开源技术标准等全景增长策略。 ]]></description>
+</ol>  ]]></content:encoded>
 </item>
 <item>
-<title><![CDATA[ Hello maxRSS ]]></title>
+<title><![CDATA[  Hello maxRSS  ]]></title>
 <link>https://github.com/fengyiqicoder/maxRSS</link>
 <guid>https://github.com/fengyiqicoder/maxRSS</guid>
 <pubDate>Tue, 03 Mar 2026 14:45:54 +0800</pubDate>
-<description><![CDATA[ maxRSS 测试成功！这是一个私人 RSS 发布站的测试条目。 ]]></description>
+<description><![CDATA[  maxRSS 测试成功！这是一个私人 RSS 发布站的测试条目。  ]]></description>
 </item>
 </channel>
 </rss>

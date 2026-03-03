@@ -156,7 +156,7 @@ def generate_rss(config, items):
     ]
 
     for item in items[:max_items]:
-        # guid
+        # guid: 有效 URL 直接用，否则加 isPermaLink="false"
         guid = item.get('guid', '')
         if guid and guid != '#':
             guid_text = guid
@@ -165,17 +165,20 @@ def generate_rss(config, items):
         else:
             guid_text = f"maxrss-{uuid.uuid4().hex[:12]}"
 
+        is_url = guid_text.startswith('http://') or guid_text.startswith('https://')
+        guid_attr = '' if is_url else ' isPermaLink="false"'
+
         lines.append('<item>')
         lines.append(f'<title><![CDATA[ {item["title"]} ]]></title>')
         lines.append(f'<link>{xml_escape(item.get("link", ""))}</link>')
-        lines.append(f'<guid>{xml_escape(guid_text)}</guid>')
+        lines.append(f'<guid{guid_attr}>{xml_escape(guid_text)}</guid>')
         lines.append(f'<pubDate>{item["pubDate"]}</pubDate>')
+        lines.append(f'<description><![CDATA[ {item.get("description", "")} ]]></description>')
 
         if item.get('content'):
             html_content = markdown_to_html(item['content'])
             lines.append(f'<content:encoded><![CDATA[ {html_content} ]]></content:encoded>')
 
-        lines.append(f'<description><![CDATA[ {item.get("description", "")} ]]></description>')
         lines.append('</item>')
 
     lines.append('</channel>')
