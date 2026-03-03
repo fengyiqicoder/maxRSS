@@ -58,10 +58,13 @@ def load_existing_feeds(feed_path):
 
 def generate_rss(config, items):
     """生成 RSS XML"""
+    # 注册命名空间前缀，避免 ElementTree 自动生成 ns0/ns1
+    import xml.etree.ElementTree as ET
+    ET.register_namespace('atom', 'http://www.w3.org/2005/Atom')
+    ET.register_namespace('content', 'http://purl.org/rss/1.0/modules/content/')
+
     rss = Element('rss')
     rss.set('version', '2.0')
-    rss.set('xmlns:atom', 'http://www.w3.org/2005/Atom')
-    rss.set('xmlns:content', 'http://purl.org/rss/1.0/modules/content/')
     
     channel = SubElement(rss, 'channel')
     
