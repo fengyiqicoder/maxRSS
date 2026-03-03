@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<rss xmlns:ns0="http://www.w3.org/2005/Atom" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" version="2.0">
+  <channel>
+    <title>fengyq's Private RSS</title>
+    <description>我的私人 RSS 订阅</description>
+    <link>https://rss.000ooo.ooo</link>
+    <language>zh-CN</language>
+    <lastBuildDate>Tue, 03 Mar 2026 14:45:54 +0800</lastBuildDate>
+    <generator>maxRSS</generator>
+    <ns0:link href="https://rss.000ooo.ooo/feed.xml" rel="self" type="application/rss+xml"/>
+    <item>
+      <title>Hello maxRSS</title>
+      <link>https://github.com/fengyiqicoder/maxRSS</link>
+      <description>maxRSS 测试成功！这是一个私人 RSS 发布站的测试条目。</description>
+      <pubDate>Tue, 03 Mar 2026 14:45:54 +0800</pubDate>
+      <guid>https://github.com/fengyiqicoder/maxRSS</guid>
+    </item>
+  </channel>
+</rss>
